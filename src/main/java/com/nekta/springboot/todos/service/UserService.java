@@ -1,8 +1,10 @@
 package com.nekta.springboot.todos.service;
 
-import com.nekta.springboot.todos.entity.User;
+import com.nekta.springboot.todos.response.UserResponse;
 
 public interface UserService {
 
-    User getUserInfo();
+    UserResponse getUserInfo();
+
+    void deleteUser();
 }

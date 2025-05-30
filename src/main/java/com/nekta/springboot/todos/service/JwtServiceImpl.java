@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -40,9 +39,17 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
+
+
+    @Override
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -52,11 +59,6 @@ public class JwtServiceImpl implements JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
 
     @Override
     public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
